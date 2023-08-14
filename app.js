@@ -41,4 +41,4 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("WebSocket closed with code:", event.code);
         // Handle any cleanup or reconnection logic here.
     });
-});
+}); 

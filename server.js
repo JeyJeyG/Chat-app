@@ -1,32 +1,44 @@
-const http = require("http");
-const WebSocket = require("ws");
+document.addEventListener("DOMContentLoaded", () => {
+    const chatMessages = document.getElementById("chat-messages");
+    const messageInput = document.getElementById("message-input");
+    const sendButton = document.getElementById("send-button");
 
-const server = http.createServer();
-const wss = new WebSocket.Server({ server });
+    // Connect to WebSocket
+    const socket = new WebSocket("ws://localhost:3000");
 
-wss.on("connection", ws => {
-    console.log("New WebSocket connection established.");
+    // Send button Event Listener
+    sendButton.addEventListener("click", () => {
+        const message = messageInput.value.trim();
 
-    ws.on("message", message => {
-        // Broadcast the message to all connected clients
-        wss.clients.forEach(client => {
-            if (client !== ws && client.readyState === WebSocket.OPEN) {
-                client.send(message);
-            }
-        });
+        if (socket.readyState === WebSocket.OPEN) {
+            // Send message to server
+            socket.send(message);
+            messageInput.value = "";
+        } else {
+            console.error("WebSocket is not open.");
+        }
     });
 
-    ws.on("close", () => {
-        console.log("WebSocket connection closed.");
+    // Adding event Listener for incoming messages
+    socket.addEventListener("message", event => {
+        const message = event.data;
+
+        // Append message to chat
+        const messageElement = document.createElement("div");
+        messageElement.className = "message";
+        messageElement.textContent = message;
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    });
+
+    // Event listener for WebSocket Errors
+    socket.addEventListener("error", event => {
+        console.error("WebSocket error:", event);
+    });
+
+    // Event listener for WebSocket Closure
+    socket.addEventListener("close", event => {
+        console.log("WebSocket closed with code:", event.code);
+        // Handle any cleanup or reconnection logic here.
     });
 });
-
-server.listen(3000, () => {
-    console.log("Server is listening on port 3000.");
-});
-if (socket.readyState === WebSocket.OPEN) {
-    // Send the message
-    socket.send(message);
-} else {
-    console.error("WebSocket is not open.");
-}
