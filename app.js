@@ -42,3 +42,4 @@ document.addEventListener("DOMContentLoaded", () => {
         // Handle any cleanup or reconnection logic here.
     });
 }); 
+//app.js:7 WebSocket connection to 'ws://localhost:3000/' failed: 
